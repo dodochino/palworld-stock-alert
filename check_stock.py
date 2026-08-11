@@ -1,3 +1,4 @@
+import os
 import requests
 from bs4 import BeautifulSoup
 
@@ -37,6 +38,31 @@ found_keywords = [
 if found_keywords:
     print("🚨 POSSIBLE PALWORLD SLEEVE PRODUCT FOUND!")
     print("Matched:", ", ".join(found_keywords))
-    print(URL)
+
+    bot_token = os.environ["TELEGRAM_BOT_TOKEN"]
+    chat_id = os.environ["TELEGRAM_CHAT_ID"]
+
+    message = (
+        "🚨 PALWORLD STOCK ALERT! 🚨\n\n"
+        "A possible Palworld Sleeve & Card Set has appeared "
+        "on BackesTCG!\n\n"
+        f"Matched: {', '.join(found_keywords)}\n\n"
+        f"🛒 {URL}"
+    )
+
+    telegram_url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+
+    telegram_response = requests.post(
+        telegram_url,
+        data={
+            "chat_id": chat_id,
+            "text": message
+        },
+        timeout=30
+    )
+
+    telegram_response.raise_for_status()
+
+    print("✅ Telegram alert sent!")
 else:
     print("No matching product found yet.")
